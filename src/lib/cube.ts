@@ -10,6 +10,8 @@ export interface TurnDefinition { axis: 0 | 1 | 2; layers: number[]; direction: 
 export const FACE_COLORS: Record<Face, string> = {
   U: '#ffffff', R: '#e52332', F: '#00a651', D: '#ffdf00', L: '#ff8200', B: '#075be8',
 }
+/** Rotate the standard white-top scheme around the front axis, preserving its handedness. */
+export const YELLOW_TOP_COLORS: Record<Face, string> = { ...FACE_COLORS, U: FACE_COLORS.D, D: FACE_COLORS.U, R: FACE_COLORS.L, L: FACE_COLORS.R }
 export const FACE_NAMES: Record<Face, string> = { U: 'Up', R: 'Right', F: 'Front', D: 'Down', L: 'Left', B: 'Back' }
 const FACE_NORMALS: Record<Face, Vector> = { U: [0, 1, 0], R: [1, 0, 0], F: [0, 0, 1], D: [0, -1, 0], L: [-1, 0, 0], B: [0, 0, -1] }
 const DEFINITIONS: Record<TurnFace, Omit<TurnDefinition, 'turns'>> = {

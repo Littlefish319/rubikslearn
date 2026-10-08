@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { Check, ChevronLeft, ChevronRight, Hand, Pause, Play, RotateCcw, Shuffle, Undo2 } from 'lucide-react'
-import { applyAlgorithm, applyMove, createSolvedCube, FACE_COLORS, FACE_NAMES, generateScramble, inverseMove, invertAlgorithm, isCubeSolved, parseAlgorithm, trainingTargetStickerIds, turnDefinition, type CubeState, type Face, type Move, type Sticker, type Vector } from '../lib/cube'
+import { applyAlgorithm, applyMove, createSolvedCube, FACE_COLORS, FACE_NAMES, YELLOW_TOP_COLORS, generateScramble, inverseMove, invertAlgorithm, isCubeSolved, parseAlgorithm, trainingTargetStickerIds, turnDefinition, type CubeState, type Face, type Move, type Sticker, type Vector } from '../lib/cube'
 import './CubeTrainer.css'
 
 export interface CubeTrainerProps {
@@ -17,12 +17,16 @@ export interface CubeTrainerProps {
   orientation?: 'white-top' | 'yellow-top'
   /** Track the cubies being trained while leaving other colors visible. */
   focus?: 'cross' | 'f2l' | 'oll' | 'pll'
+  /** A real entered cube takes precedence over an inverse-generated practice case. */
+  initialState?: CubeState
+  onStepChange?: (completed: number, state: CubeState) => void
+  instructionDetail?: string
+  solvedMessage?: string
 }
 
 type PlaybackSpeed = 'slow' | 'normal' | 'fast'
 const TURN_DURATION: Record<PlaybackSpeed, number> = { slow: 2000, normal: 1000, fast: 450 }
 const HALF_TURN_DURATION: Record<PlaybackSpeed, number> = { slow: 2800, normal: 1500, fast: 700 }
-const YELLOW_TOP_COLORS: Record<Face, string> = { ...FACE_COLORS, U: FACE_COLORS.D, D: FACE_COLORS.U }
 
 function describeMove(move: Move) {
   const face = move[0]
@@ -67,7 +71,8 @@ function makeTargetRingGeometry() {
   return new THREE.ShapeGeometry(ring, 6)
 }
 
-function initialCube(algorithm?: string) {
+function initialCube(algorithm?: string, initialState?: CubeState): CubeState {
+  if (initialState) return initialState.map(sticker => ({ ...sticker, position: [...sticker.position], normal: [...sticker.normal] }))
   try { return algorithm ? applyAlgorithm(createSolvedCube(), invertAlgorithm(algorithm)) : createSolvedCube() }
   catch { return createSolvedCube() }
 }
@@ -80,11 +85,11 @@ function netOrder(face: Face, sticker: Sticker) {
   return (1 - y) * 3 + column + 1
 }
 
-export default function CubeTrainer({ compact = false, algorithm, coach = false, orientation = algorithm || coach ? 'yellow-top' : 'white-top', focus }: CubeTrainerProps) {
+export default function CubeTrainer({ compact = false, algorithm, coach = false, orientation = algorithm || coach ? 'yellow-top' : 'white-top', focus, initialState, onStepChange, instructionDetail, solvedMessage }: CubeTrainerProps) {
   const caseAlgorithm = algorithm ?? (coach ? "R U R' U'" : undefined)
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<CubeView | null>(null)
-  const stateRef = useRef<CubeState>(initialCube(caseAlgorithm))
+  const stateRef = useRef<CubeState>(initialCube(caseAlgorithm, initialState))
   const mountedRef = useRef(true)
   const runningRef = useRef(false)
   const runEpoch = useRef(0)
@@ -113,6 +118,7 @@ export default function CubeTrainer({ compact = false, algorithm, coach = false,
   const focusMove = busy && currentMove ? currentMove as Move : algorithmMoves[focusIndex]
   const moveDescription = focusMove ? describeMove(focusMove) : null
   const solved = isCubeSolved(cubeState)
+  useEffect(() => { onStepChange?.(completedMoves, cubeState) }, [completedMoves, cubeState, onStepChange])
 
   useEffect(() => {
     mountedRef.current = true
@@ -194,6 +200,7 @@ export default function CubeTrainer({ compact = false, algorithm, coach = false,
       })
       for (const sticker of state) {
         const mesh = stickers.get(sticker.id)!
+        mesh.material = stickerMaterials[sticker.color]
         const normal = new THREE.Vector3(...sticker.normal)
         mesh.position.set(...sticker.position).addScaledVector(normal, 0.493)
         mesh.quaternion.setFromUnitVectors(forward, normal)
@@ -315,13 +322,13 @@ export default function CubeTrainer({ compact = false, algorithm, coach = false,
     setActiveStep(null)
     setCurrentMove('')
     setMoveProgress(0)
-    const state = initialCube(caseAlgorithm)
+    const state = initialCube(caseAlgorithm, initialState)
     stateRef.current = state
     setCubeState(state)
     setHistory([])
     setError('')
     viewRef.current?.sync(state)
-  }, [caseAlgorithm, coach, orientation, focus])
+  }, [caseAlgorithm, coach, orientation, focus, initialState])
 
   async function runMoves(moves: Move[], undo = false, guidedDirection?: 1 | -1, manual = false) {
     if (runningRef.current || !moves.length) return
@@ -376,7 +383,7 @@ export default function CubeTrainer({ compact = false, algorithm, coach = false,
 
   function reset() {
     if (runningRef.current) return
-    const state = initialCube(caseAlgorithm)
+    const state = initialCube(caseAlgorithm, initialState)
     stateRef.current = state
     setCubeState(state)
     setHistory([])
@@ -418,13 +425,13 @@ export default function CubeTrainer({ compact = false, algorithm, coach = false,
         {!compact && !coach && <div className="cube-stage-topline"><span className={`cube-state-label${solved ? ' cube-state-label--solved' : ''}`}>{solved ? <Check size={13} /> : <span className="cube-status-dot" />}{solved ? 'Solved state' : 'Practice in progress'}</span><button className="cube-view-reset" onClick={() => viewRef.current?.resetView()} aria-label="Reset cube viewing angle"><RotateCcw size={15} /></button></div>}
         <div className="cube-canvas" ref={containerRef} />
         {!webglAvailable && <div className="cube-fallback"><div className="cube-net">{(['U', 'L', 'F', 'R', 'B', 'D'] as Face[]).map((face) => <div key={face} className={`cube-net-face cube-net-face--${face}${busy && currentMove[0]?.toUpperCase() === face ? ' cube-net-face--turning' : ''}`} aria-label={`${FACE_NAMES[face]} face`} style={busy && currentMove[0]?.toUpperCase() === face ? { transform: `rotate(${moveProgress * 90 * (currentMove.endsWith('2') ? 2 : currentMove.endsWith("'") ? -1 : 1)}deg)` } : undefined}>{cubeState.filter((sticker) => sticker.normal.join() === ({ U: '0,1,0', D: '0,-1,0', R: '1,0,0', L: '-1,0,0', F: '0,0,1', B: '0,0,-1' }[face])).sort((a, b) => netOrder(face, a) - netOrder(face, b)).map((sticker) => <i key={sticker.id} className={hasTargets && highlightTargets && targetStickerIds.has(sticker.id) ? 'cube-target-sticker' : undefined} style={{ background: palette[sticker.color] }} />)}</div>)}</div>{busy ? <div className="cube-fallback-turn"><span>Turning {currentMove} slowly…</span><div role="progressbar" aria-label="Turn progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(moveProgress * 100)}><i style={{ width: `${moveProgress * 100}%` }} /></div></div> : <span>3D is unavailable. Follow the same turns in this flat cube view.</span>}</div>}
-        {coach && <p className="cube-coach-grip" aria-label="Starting cube center colors"><span><i style={{ background: palette.U }} />{orientation === 'yellow-top' ? 'Yellow' : 'White'} top</span><span><i style={{ background: palette.F }} />Green front</span><span><i style={{ background: palette.R }} />Red right</span></p>}
+        {coach && <p className="cube-coach-grip" aria-label="Starting cube center colors"><span><i style={{ background: palette.U }} />{orientation === 'yellow-top' ? 'Yellow' : 'White'} top</span><span><i style={{ background: palette.F }} />Green front</span><span><i style={{ background: palette.R }} />{orientation === 'yellow-top' ? 'Orange' : 'Red'} right</span></p>}
         {!compact && !coach && <div className="cube-stage-hint"><Hand size={14} /> Drag to explore <span>•</span> Start grip: {orientation === 'yellow-top' ? 'yellow' : 'white'} top, green front</div>}
         {!compact && !coach && currentMove && <div className="cube-active-move" aria-live="polite">{currentMove}</div>}
       </div>
       {coach && <div className="cube-coach-controls cube-controls">
         <div className="cube-coach-instruction" aria-live="polite">
-          {focusMove && moveDescription ? <><span className="cube-coach-letter">{focusMove}</span><div><span className="cube-coach-label">Move {focusIndex + 1} of {algorithmMoves.length}</span><h4>{moveDescription.action}</h4><p>{moveDescription.detail}</p></div></> : <><span className="cube-coach-letter"><Check size={28} /></span><div><span className="cube-coach-label">Finished</span><h4>{solved ? 'You solved this practice case.' : 'All moves complete.'}</h4><p>Reset the case to practice again.</p></div></>}
+          {focusMove && moveDescription ? <><span className="cube-coach-letter">{focusMove}</span><div><span className="cube-coach-label">Move {focusIndex + 1} of {algorithmMoves.length}</span><h4>{moveDescription.action}</h4><p>{moveDescription.detail}</p>{instructionDetail && <p className="cube-move-purpose">{instructionDetail}</p>}</div></> : <><span className="cube-coach-letter"><Check size={28} /></span><div><span className="cube-coach-label">Finished</span><h4>{solved ? solvedMessage || 'You solved this practice case.' : 'All moves complete.'}</h4><p>Reset the case to practice again.</p></div></>}
         </div>
         <div className="cube-coach-step-buttons"><button disabled={busy || completedMoves === 0} onClick={() => void runMoves([inverseMove(algorithmMoves[completedMoves - 1])], true, -1, true)}><ChevronLeft size={18} /> Previous</button><button disabled={busy || completedMoves >= algorithmMoves.length} onClick={() => void runMoves([algorithmMoves[completedMoves]], false, 1, true)}>Next move <ChevronRight size={21} /></button></div>
         <div className="cube-coach-secondary"><button disabled={busy} onClick={reset}><RotateCcw size={16} />Reset case</button><details className="cube-coach-options"><summary>More controls</summary><div className="cube-coach-playback"><button disabled={pauseRequested || !algorithmMoves.length || (!busy && completedMoves === algorithmMoves.length)} onClick={() => busy ? pauseCoach() : playCoach()}>{busy ? <Pause size={18} /> : <Play size={18} />}{pauseRequested ? 'Pausing…' : busy ? 'Pause' : completedMoves === algorithmMoves.length ? 'Complete' : completedMoves ? 'Play remaining' : 'Play all'}</button><button disabled={busy || !algorithmMoves.length} onClick={() => playCoach(true)}><RotateCcw size={18} />Replay</button></div><label className="cube-coach-speed">Autoplay speed<select value={speed} onChange={(event) => changeSpeed(event.target.value as PlaybackSpeed)}><option value="slow">Slow</option><option value="normal">Normal</option><option value="fast">Fast</option></select></label><p className="cube-coach-note">Next move always shows one slow turn, then waits for you.</p>{hasTargets && <div className="cube-target-guide"><label><input type="checkbox" checked={highlightTargets} onChange={(event) => setHighlightTargets(event.target.checked)} />{focus === 'f2l' ? 'Highlight target pair' : 'Highlight cross edges'}</label><p>Violet follows {focus === 'f2l' ? 'the front-right corner and edge' : 'the four cross edges'}.</p></div>}<div className="cube-coach-progress"><span>Moves completed</span><span className="cube-coach-count">{completedMoves} / {algorithmMoves.length}</span></div><div className="cube-coach-moves" aria-label="Algorithm move progress">{algorithmMoves.map((move, index) => <span key={`${index}-${move}`} aria-current={index === focusIndex ? 'step' : undefined} className={`${index < completedMoves ? 'is-complete ' : ''}${index === focusIndex ? 'is-current' : ''}`}>{move}</span>)}</div><button className="cube-coach-view-reset" onClick={() => viewRef.current?.resetView()}><RotateCcw size={16} />Reset viewing angle</button></details></div>

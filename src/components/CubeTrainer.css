@@ -1,4 +1,5 @@
 .cube-trainer { display: grid; grid-template-columns: 1fr; overflow: hidden; border: 1px solid #e3e5dc; border-radius: 20px; background: #fff; color: #242a23; }
+.cube-move-purpose{margin-top:8px!important;color:#344d2d!important}
 .cube-stage { min-width: 0; position: relative; background: radial-gradient(ellipse at 50% 47%, #f1f3e9 0%, #f9faf5 66%); }
 .cube-canvas { position: relative; height: 354px; width: 100%; touch-action: none; cursor: grab; }
 .cube-canvas:active { cursor: grabbing; }

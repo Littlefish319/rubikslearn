@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDown, ArrowRight, Bookmark, Check, ChevronRight, Copy, Lightbulb, RotateCcw, Search, Sparkles, Target } from 'lucide-react';
 import { algorithmDiagram, algorithms, invertAlgorithm, isInCategory, type Algorithm, type AlgorithmCategory } from '../data/algorithms';
-import { FACE_COLORS, parseAlgorithm, type Face } from '../lib/cube';
+import { YELLOW_TOP_COLORS, parseAlgorithm, type Face } from '../lib/cube';
 import CubeTrainer from './CubeTrainer';
 import './Algorithms.css';
 
 const bookmarkKey = 'cubiq-bookmarks';
 const repetitionKey = 'cubiq-algorithm-reps';
 const categories: Array<'All algorithms' | AlgorithmCategory> = ['Full PLL', '2-look OLL', '2-look PLL', 'Foundations', 'All algorithms'];
-const diagramColors: Record<Face, string> = { ...FACE_COLORS, U: FACE_COLORS.D, D: FACE_COLORS.U };
-const diagramColorNames: Record<Face, string> = { U: 'yellow', D: 'white', F: 'green', R: 'red', B: 'blue', L: 'orange' };
+const diagramColors = YELLOW_TOP_COLORS;
+const diagramColorNames: Record<Face, string> = { U: 'yellow', D: 'white', F: 'green', R: 'orange', B: 'blue', L: 'red' };
 const sideNames = { F: 'Front', R: 'Right', B: 'Back', L: 'Left' };
 const diagrams = new Map(algorithms.map(algorithm => [algorithm.id, algorithmDiagram(algorithm)]));
 

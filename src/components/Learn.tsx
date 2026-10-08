@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, ChevronDown, RotateCcw, Trophy } from 'lucide-react'
 import { lessons } from '../data/curriculum'
+import { lessonGoals } from '../data/lessonGoals'
 import { invertAlgorithm } from '../lib/cube'
 import CubeTrainer from './CubeTrainer'
 import './Learn.css'
@@ -29,6 +30,7 @@ export default function Learn({ initialLessonId, onProgressChange }: LearnProps)
   const [checked, setChecked] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const lessonNavigation = useRef<HTMLDetailsElement>(null)
+  const activePlanStep = useRef<HTMLButtonElement>(null)
   const lesson = lessons.find(l => l.id === selectedId) || initial
   const trackLessons = lessons.filter(l => l.track === track)
   const lessonIndex = trackLessons.findIndex(l => l.id === lesson.id)
@@ -36,6 +38,7 @@ export default function Learn({ initialLessonId, onProgressChange }: LearnProps)
   const currentStep = lesson.steps[Math.min(step, lesson.steps.length - 1)]
   const isCorrect = checked && answer === lesson.quiz.answer
   const trackComplete = trackLessons.filter(l => completed.includes(l.id)).length
+  useEffect(() => { activePlanStep.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' }) }, [selectedId, step])
 
   function selectLesson(id: string) {
     const next = lessons.find(l => l.id === id)
@@ -75,11 +78,13 @@ export default function Learn({ initialLessonId, onProgressChange }: LearnProps)
         <button className={track === 'cfop' ? 'is-active' : ''} aria-pressed={track === 'cfop'} onClick={() => changeTrack('cfop')}><Trophy size={18} /> CFOP</button>
         <button className={track === 'basics' ? 'is-active' : ''} aria-pressed={track === 'basics'} onClick={() => changeTrack('basics')}><BookOpen size={18} /> Optional basics</button>
       </div>
-      {track === 'cfop' && <nav className="learn-method-roadmap" aria-label="The four stages of CFOP">{stages.map(({ name, id }, i) => <button key={id} className={lesson.stage === name ? 'is-current' : ''} aria-current={lesson.stage === name ? 'step' : undefined} onClick={() => selectLesson(id)}><span>{i + 1}</span>{name}</button>)}</nav>}
       <label className="learn-lesson-picker"><span>Lesson</span><select aria-label="Lesson" value={lesson.id} onChange={event => selectLesson(event.target.value)}>{trackLessons.map((item, i) => <option key={item.id} value={item.id}>{i + 1}. {item.title}{completed.includes(item.id) ? ' ✓' : ''}</option>)}</select></label>
-      <nav className="learn-step-progress" aria-label="Lesson steps">{lesson.steps.map((item, i) => <button key={item.title} className={i === step ? 'is-current' : ''} onClick={() => changeStep(i)} aria-label={`Step ${i + 1}: ${item.title}`} aria-current={i === step ? 'step' : undefined}>{i + 1}</button>)}<button className={`learn-check-step ${isQuiz ? 'is-current' : ''}`} onClick={() => changeStep(lesson.steps.length)} aria-label="Knowledge check" aria-current={isQuiz ? 'step' : undefined}><Check size={18} /><span>Check</span></button></nav>
       </div>
     </details>
+
+    {track === 'cfop' && <nav className="learn-method-roadmap learn-overall-path" aria-label="The four stages of CFOP">{stages.map(({ name, id }, i) => <button key={id} className={lesson.stage === name ? 'is-current' : ''} aria-current={lesson.stage === name ? 'step' : undefined} onClick={() => selectLesson(id)}><span>{i + 1}</span>{name}</button>)}</nav>}
+    <section className="learn-lesson-goal" aria-label="Lesson purpose and complete plan"><div><strong>Your goal</strong><p>{lessonGoals[lesson.id] || lesson.description}</p></div><span>Lesson step {step + 1} of {lesson.steps.length + 1}</span></section>
+    <nav className="learn-plan-steps" aria-label="Named lesson steps">{lesson.steps.map((item, i) => <button key={item.title} ref={i === step ? activePlanStep : undefined} className={i === step ? 'is-current' : ''} onClick={() => changeStep(i)} aria-label={`Step ${i + 1}: ${item.title}`} aria-current={i === step ? 'step' : undefined}><span>{i + 1}</span><strong>{item.title}</strong></button>)}<button ref={isQuiz ? activePlanStep : undefined} className={isQuiz ? 'is-current' : ''} onClick={() => changeStep(lesson.steps.length)} aria-label="Knowledge check" aria-current={isQuiz ? 'step' : undefined}><span>{lesson.steps.length + 1}</span><strong>Knowledge check</strong></button></nav>
 
     <section className="learn-workspace" aria-label={lesson.title}>
 

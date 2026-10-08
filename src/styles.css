@@ -54,6 +54,7 @@
   .hero-copy>p { font-size:16px; }
   .section-heading .text-button { font-size:15px; }
 }
+.solver-dashboard-entry{display:flex;align-items:center;gap:15px;width:100%;padding:19px 22px;margin:21px 0;border:1px solid #cbd5c8;border-radius:12px;background:#edf3e6;text-align:left;color:#344d2d}.solver-dashboard-entry>span{flex:1;min-width:0}.solver-dashboard-entry strong{display:block;font-size:19px;line-height:1.5}.solver-dashboard-entry small{display:block;font-size:16px;line-height:1.6;margin-top:4px;color:#4e5b50}.solver-dashboard-entry>svg{flex-shrink:0}.solver-dashboard-entry:hover{background:#e3ecd8}@media(max-width:600px){.solver-dashboard-entry{padding:17px 15px;gap:10px}.solver-dashboard-entry strong{font-size:18px}.solver-dashboard-entry small{font-size:15px}}
 @media (max-width:700px) {
   .sidebar { width:270px; max-width:calc(100vw - 35px); }
   .main-shell { margin-left:0; }
