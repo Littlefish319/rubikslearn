@@ -55,3 +55,47 @@
 @media (min-width: 1050px) { .cube-trainer:not(.cube-trainer--compact) { grid-template-columns: minmax(280px, 1.15fr) minmax(280px, 1fr); } .cube-trainer:not(.cube-trainer--compact) .cube-canvas { height: 100%; min-height: 430px; } .cube-controls { border-top: 0; border-left: 1px solid #e8ebdf; } }
 @media (max-width: 500px) { .cube-canvas { height: 295px; } .cube-controls { padding: 20px; } .cube-stage-hint { font-size: 9px; gap: 5px; } .cube-trainer--compact .cube-canvas { min-height: 220px; } }
 @media (prefers-reduced-motion: reduce) { .cube-face-buttons button { transition: none; } }
+.cube-coach-count { font-size: 12px; color: #6a7856; background: #f0f4e8; border-radius: 7px; padding: 7px 9px; white-space: nowrap; }
+.cube-coach-grip { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #647058; margin: 15px 0; }
+.cube-coach-grip i { width: 11px; height: 11px; border-radius: 3px; border: 1px solid #0002; }
+.cube-coach-grip > span { color: #a2aa98; margin: 0 3px; }
+.cube-target-guide { padding: 11px 12px; margin: 0 0 14px; border: 1px solid #e9dff4; background: #fbf8ff; border-radius: 9px; }
+.cube-target-guide label { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 600; color: #66507a; cursor: pointer; }
+.cube-target-guide input { accent-color: #8b4dd5; margin: 0; }
+.cube-target-guide p { display: flex; align-items: center; gap: 6px; margin: 9px 0 5px; font-size: 10px; color: #776386; }
+.cube-target-guide p i { width: 9px; height: 9px; border: 2px solid #8b4dd5; border-radius: 2px; }
+.cube-target-guide small { display: block; font-size: 9px; line-height: 1.5; color: #9988a6; }
+.cube-net-face i.cube-target-sticker { box-shadow: inset 0 0 0 3px #8b4dd5; }
+.cube-net-face i.cube-muted-sticker { opacity: .55; }
+.cube-coach-moves { display: flex; flex-wrap: wrap; gap: 5px; }
+.cube-coach-moves > span { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; min-width: 35px; min-height: 43px; padding: 5px 7px; border-radius: 8px; border: 1px solid #e2e5dc; background: #f6f7f1; color: #738064; font-size: 14px; font-weight: 650; }
+.cube-coach-moves small { font-size: 8px; font-weight: 500; opacity: .7; margin-bottom: 2px; }
+.cube-coach-moves > span.is-complete { background: #eaf1df; border-color: #d6e3c4; color: #597242; }
+.cube-coach-moves > span.is-current { background: #fff0e6; border-color: #f2a27c; color: #c25b2e; box-shadow: 0 0 0 1px #f2a27c; }
+.cube-coach-instruction { display: flex; align-items: flex-start; gap: 13px; padding: 18px 0; min-height: 128px; }
+.cube-coach-letter { display: grid; place-items: center; min-width: 52px; height: 54px; border-radius: 12px; background: #fff0e6; color: #c25b2e; font-size: 25px; font-weight: 700; }
+.cube-coach-instruction > div { min-width: 0; }
+.cube-coach-instruction h4 { margin: 5px 0 7px; font-size: 15px; font-weight: 650; line-height: 1.5; }
+.cube-coach-instruction p { margin: 0; font-size: 11px; line-height: 1.65; color: #7e8775; }
+.cube-coach-step-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cube-coach-step-buttons button, .cube-coach-playback button, .cube-compact-controls button { display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px 8px; border: 1px solid #dfe5d5; background: #f8faf4; border-radius: 8px; font-family: inherit; font-size: 11px; color: #536244; cursor: pointer; }
+.cube-coach-step-buttons button:last-child { background: #f36b40; border-color: #f36b40; color: #fff; }
+.cube-coach-playback { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.cube-coach-playback button { flex: 1; min-width: 88px; padding: 8px 7px; font-size: 10px; background: #fff; }
+.cube-coach-speed { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; font-size: 11px; color: #75806a; margin-top: 17px; }
+.cube-coach-speed select { min-width: 0; max-width: 100%; font: inherit; color: #4d5e3f; padding: 8px; border: 1px solid #e1e6d8; border-radius: 7px; background: #fafbf7; }
+.cube-coach-speed select:focus-visible { outline: 3px solid #f8a27b; outline-offset: 2px; }
+.cube-coach-note { font-size: 10px; line-height: 1.7; color: #8a9380; margin: 13px 0 0; }
+.cube-trainer--compact-case { display: flex; flex-direction: column; height: auto; min-height: 0; }
+.cube-trainer--compact-case .cube-stage { height: auto; flex: 1; }
+.cube-trainer--compact-case .cube-canvas { height: 260px; }
+.cube-compact-controls { padding: 0 12px 12px; text-align: center; }
+.cube-compact-controls p { font-size: 10px; color: #7b886a; margin: 2px 0 10px; }
+.cube-compact-controls > div { display: flex; justify-content: center; flex-wrap: wrap; gap: 7px; }
+.cube-compact-controls button { font-size: 10px; padding: 8px 10px; background: #ffffffb3; }
+.cube-compact-controls button:first-child { background: #edf2e4; }
+.cube-compact-controls button:disabled { cursor: not-allowed; opacity: .55; }
+.cube-compact-controls button:focus-visible { outline: 3px solid #f8a27b; outline-offset: 3px; }
+.cube-compact-controls > span { display: block; font-size: 10px; color: #bd603d; margin-top: 8px; }
+@media (min-width: 1050px) { .cube-trainer--coach:not(.cube-trainer--compact) { grid-template-columns: minmax(230px, 1fr) minmax(280px, 1.2fr); } }
+@media (max-width: 500px) { .cube-trainer--compact-case .cube-canvas { height: 240px; } .cube-coach-step-buttons button { font-size: 10px; } .cube-coach-instruction { min-height: 140px; } }

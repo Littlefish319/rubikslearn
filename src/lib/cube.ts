@@ -40,6 +40,13 @@ export function createSolvedCube(): CubeState {
   })
 }
 
+/** Stable sticker identities for the cubies a CFOP exercise asks you to track. */
+export function trainingTargetStickerIds(focus: 'cross' | 'f2l'): Set<string> {
+  return new Set(createSolvedCube().filter(({ position: [x, y, z] }) => focus === 'f2l'
+    ? x === 1 && z === 1 && (y === -1 || y === 0)
+    : y === -1 && Math.abs(x) + Math.abs(y) + Math.abs(z) === 2).map(({ id }) => id))
+}
+
 export function parseAlgorithm(algorithm: string): Move[] {
   const normalized = algorithm.trim().replace(/[′’]/g, "'").replace(/([URFDLB])w/g, (_, face: string) => face.toLowerCase())
   if (!normalized) return []
