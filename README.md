@@ -17,8 +17,8 @@ Vite listens on port 3000. For a production bundle, run `npm run build`; `npm ru
 
 - A dashboard with real learning progress, goals, practice streaks, and a daily three-solve challenge.
 - A default 14-lesson CFOP competition path: direct cross, paired F2L, OLL, PLL, and deliberate speed training. Thirteen optional basics lessons preserve earlier progress.
-- Short setup, recognition, action, and success checks, with verified practice cases and scored knowledge checks.
-- A Three.js 3×3 simulator with prepared cases, next/previous moves, plain-language turn explanations, adjustable playback speed, and draggable camera. A 2D cube net is available if WebGL cannot initialize.
+- Focused lessons with readable instructions, verified practice cases, optional detail disclosures, and scored knowledge checks.
+- A Three.js 3×3 simulator with standard bright sticker colors and prepared cases. Manual next/previous moves take 2 seconds per quarter-turn and 2.8 seconds per half-turn, including when the device requests reduced motion. Automatic playback has a separate speed control. A 2D cube net is available if WebGL cannot initialize.
 - Competitive solve timing: hold Space and release to start, tap or press a key to stop, optional inspection, +2/DNF editing, and trimmed ao5/ao12 averages.
 - All 21 PLL cases, the complete two-look OLL/PLL bridge, recognition diagrams with side stickers, exact practice setups, bookmarks, and repetition tracking.
 - Progress charts and downloadable JSON data backups.
@@ -34,9 +34,10 @@ This version runs entirely in the browser. Solves, lesson completion, goals, alg
 ```sh
 npm test
 npm run build
+npm run test:browser
 ```
 
-The tests exercise cube rotations and inverse algorithms, instructional F2L geometry, complete two-look OLL orientation coverage, all 21 distinct PLL cases, scramble properties, timing boundaries, penalties, and rolling statistics. Browser checks use the system Chromium executable at `/usr/bin/chromium` when available.
+The tests exercise cube rotations and inverse algorithms, instructional F2L geometry, complete two-look OLL orientation coverage, all 21 distinct PLL cases, scramble properties, timing boundaries, penalties, and rolling statistics. Browser regression tests check actual slow-turn timing, intermediate rendered cube frames, and readable mobile coaching controls with reduced motion enabled. They use `/usr/bin/chromium` when available; otherwise install Chromium with `npx playwright install chromium`, or set `CHROMIUM_PATH` to a compatible browser executable.
 
 ## Project layout
 

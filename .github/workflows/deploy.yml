@@ -29,6 +29,10 @@ jobs:
         run: npm ci
       - name: Check cube and lesson mechanics
         run: npm test
+      - name: Install browser for coaching checks
+        run: npx playwright install --with-deps chromium
+      - name: Check slow visual coaching
+        run: npm run test:browser
       - name: Build site
         run: npm run build
       - name: Upload Pages artifact

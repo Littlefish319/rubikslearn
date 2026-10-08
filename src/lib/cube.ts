@@ -8,7 +8,7 @@ export type CubeState = Sticker[]
 export interface TurnDefinition { axis: 0 | 1 | 2; layers: number[]; direction: 1 | -1; turns: number }
 
 export const FACE_COLORS: Record<Face, string> = {
-  U: '#fff9e7', R: '#ef6b43', F: '#92b767', D: '#f0cd50', L: '#f3a844', B: '#70a4d0',
+  U: '#ffffff', R: '#e52332', F: '#00a651', D: '#ffdf00', L: '#ff8200', B: '#075be8',
 }
 export const FACE_NAMES: Record<Face, string> = { U: 'Up', R: 'Right', F: 'Front', D: 'Down', L: 'Left', B: 'Back' }
 const FACE_NORMALS: Record<Face, Vector> = { U: [0, 1, 0], R: [1, 0, 0], F: [0, 0, 1], D: [0, -1, 0], L: [-1, 0, 0], B: [0, 0, -1] }
